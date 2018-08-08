@@ -4,15 +4,17 @@ var minimist = require('minimist')
 var version = require('./package.json').version
 var EventEmitter = require('events')
 
-module.exports = function (cb) {
-  var zenbot = { version }
+module.exports = function(cb) {
+  var zenbot = {
+    version
+  }
   var args = minimist(process.argv.slice(3))
   var conf = {}
   var config = {}
   var overrides = {}
 
   // 1. load conf overrides file if present
-  if(!_.isUndefined(args.conf)){
+  if (!_.isUndefined(args.conf)) {
     try {
       overrides = require(path.resolve(process.cwd(), args.conf))
     } catch (err) {
@@ -35,12 +37,13 @@ module.exports = function (cb) {
   var eventBus = new EventEmitter()
   zenbot.conf.eventBus = eventBus
 
-  var authStr = '', authMechanism, connectionString
+  var authStr = '',
+    authMechanism, connectionString
 
-  if(zenbot.conf.mongo.username){
+  if (zenbot.conf.mongo.username) {
     authStr = encodeURIComponent(zenbot.conf.mongo.username)
 
-    if(zenbot.conf.mongo.password) authStr += ':' + encodeURIComponent(zenbot.conf.mongo.password)
+    if (zenbot.conf.mongo.password) authStr += ':' + encodeURIComponent(zenbot.conf.mongo.password)
 
     authStr += '@'
 
@@ -52,11 +55,12 @@ module.exports = function (cb) {
     connectionString = zenbot.conf.mongo.connectionString
   } else {
     connectionString = 'mongodb://' + authStr + zenbot.conf.mongo.host + ':' + zenbot.conf.mongo.port + '/' + zenbot.conf.mongo.db + '?' +
-      (zenbot.conf.mongo.replicaSet ? '&replicaSet=' + zenbot.conf.mongo.replicaSet : '' ) +
-      (authMechanism ? '&authMechanism=' + authMechanism : '' )
+      (zenbot.conf.mongo.replicaSet ? '&replicaSet=' + zenbot.conf.mongo.replicaSet : '') +
+      (authMechanism ? '&authMechanism=' + authMechanism : '')
   }
 
-  require('mongodb').MongoClient.connect(connectionString, function (err, client) {
+
+  require('mongodb').MongoClient.connect(connectionString, function(err, client) {
     if (err) {
       console.error('WARNING: MongoDB Connection Error: ', err)
       console.error('WARNING: without MongoDB some features (such as backfilling/simulation) may be disabled.')
@@ -64,6 +68,7 @@ module.exports = function (cb) {
       cb(null, zenbot)
       return
     }
+    console.log('DB Connected')
     var db = client.db(zenbot.conf.mongo.db)
     _.set(zenbot, 'conf.db.mongo', db)
     cb(null, zenbot)
