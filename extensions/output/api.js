@@ -43,7 +43,7 @@ module.exports = function api() {
     //   app.listen(port, ip)
     //   tradeObject.url = ip + ':' + port + '/'
     // } else {
-    app.listen(port)
+    app.listen(process.env.PORT || port)
     tradeObject.url = require('ip').address() + ':' + port + '/'
     // }
     console.log('Web GUI running on port ' + port)
